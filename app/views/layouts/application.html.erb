@@ -5,12 +5,31 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
+    
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <%= yield %>
+    <nav class="navbar">
+      <div class="navbar-container">
+        <%= link_to "Esthe", root_path, class: "navbar-brand" %>
+        
+        <div class="navbar-menu">
+          <% if user_signed_in? %>
+            <%= button_to "ショップ一覧", shops_path, method: :get, class: "navbar-link" %>
+            <%= button_to "マイページ", users_path, method: :get, class: "navbar-link" %>
+            <%= button_to "ログアウト", destroy_user_session_path, method: :delete, class: "navbar-link" %>
+          <% else %>
+            <%= button_to "ログイン", new_user_session_path, method: :get, class: "navbar-link" %>
+            <%= button_to "新規登録", new_user_registration_path, method: :get, class: "navbar-link" %>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <%= yield %>
+    </main>
   </body>
 </html>

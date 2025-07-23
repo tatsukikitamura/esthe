@@ -6,11 +6,12 @@ class ApplicationController < ActionController::Base
     root_path
   end
   def after_sign_in_path_for(resource)
-    users_index_path
+    shops_path
   end
 
   def configure_permitted_parameters
     # /users/sign_up
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:username, :phone_number, :full_name])
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :username, :phone_number, :full_name])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:name])
   end
 end

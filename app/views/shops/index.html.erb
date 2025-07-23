@@ -1,0 +1,39 @@
+<div class="shops-container">
+  <h1 class="page-title">ショップ一覧</h1>
+  
+  <% if @shops.present? %>
+    <div class="shops-grid">
+      <% @shops.each do |shop| %>
+        <div class="shop-card">
+          <div class="shop-header">
+            <% if shop.profile_image.attached? %>
+              <div class="shop-image">
+                <%= image_tag shop.profile_image, alt: shop.name, class: "profile-image" %>
+              </div>
+            <% end %>
+            <h3 class="shop-name"><%= shop.name %></h3>
+          </div>
+          <div class="shop-body">
+            <p class="shop-email">
+              <i class="email-icon">📧</i>
+              <%= shop.email %>
+            </p>
+            <div class="shop-actions">
+              <%= link_to "詳細を見る", shop_path(shop), class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="shops-count">
+      <p>全<%= @shops.count %>件のショップが見つかりました</p>
+    </div>
+  <% else %>
+    <div class="no-shops">
+      <div class="no-shops-icon">🏪</div>
+      <h2>ショップが見つかりませんでした</h2>
+      <p>現在登録されているショップはありません。</p>
+    </div>
+  <% end %>
+</div>

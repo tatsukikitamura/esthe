@@ -1,3 +1,107 @@
-<%= @shops.each do |shop|%>
-  <% shop.name %>
+<% if @shop.present? %>
+  <div class="shop-detail-container">
+    <% if @shop.profile_image.attached? %>
+      <div class="shop-profile-image">
+        <%= image_tag @shop.profile_image, alt: @shop.name, class: "shop-main-image" %>
+      </div>
+    <% end %>
+    
+    <h1 class="shop-detail-title"><%= @shop.name %></h1>
+    
+    <div class="shop-rating">
+      <span class="rating-stars">★</span>
+      <span class="rating-value"><%= @shop.average_rating %></span>
+      <span class="rating-count">(<%= @shop.shop_comments.count %>件のレビュー)</span>
+    </div>
+    
+    <div class="shop-detail-info">
+      <div class="info-item">
+        <strong>ショップ名:</strong>
+        <%= @shop.name %>
+      </div>
+      
+      <div class="info-item">
+        <strong>メールアドレス:</strong>
+        <i class="email-icon">📧</i>
+        <%= @shop.email %>
+      </div>
+    </div>
+
+    <div class="persons-section">
+      <h2>スタッフ一覧</h2>
+      <% if @shop.persons.any? %>
+        <div class="persons-grid">
+          <% @shop.persons.each do |person| %>
+            <div class="person-card">
+              <% if person.profile_image.attached? %>
+                <div class="person-image">
+                  <%= image_tag person.profile_image, alt: person.name, class: "person-profile-image" %>
+                </div>
+              <% end %>
+              <h3><%= person.name %></h3>
+              <p>年齢: <%= person.age %>歳</p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="no-persons">スタッフが登録されていません。</p>
+      <% end %>
+    </div>
+
+    <!-- コメント投稿フォーム -->
+    <% if user_signed_in? %>
+      <div class="comment-form-section">
+        <h2>レビューを投稿</h2>
+        <%= form_with model: [@shop, @shop_comment],method: :post, local: true do |f| %>
+          <div class="form-group">
+            <%= f.label :rating, "評価", class: "form-label" %>
+            <%= f.select :rating, options_for_select((1..5).map{ |i| ["★" * i, i] }), { prompt: "評価を選択してください" }, { class: "form-control" } %>
+          </div>
+          
+          <div class="form-group">
+            <%= f.label :content, "コメント", class: "form-label" %>
+            <%= f.text_area :content, rows: 4, class: "form-control", placeholder: "ショップについてのコメントをお書きください" %>
+          </div>
+          
+          <%= f.submit "投稿する", class: "btn btn-primary" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- コメント一覧 -->
+    <div class="comments-section">
+      <h2>レビュー一覧</h2>
+      <% if @shop.shop_comments.any? %>
+        <div class="comments-list">
+          <% @shop.shop_comments.order(created_at: :desc).each do |comment| %>
+            <div class="comment-item">
+              <div class="comment-header">
+                <span class="comment-user"><%= comment.user.name %></span>
+                <span class="comment-rating">★<%= comment.rating %></span>
+                <span class="comment-date"><%= comment.created_at.strftime("%Y年%m月%d日") %></span>
+                <% if current_user == comment.user %>
+                  <%= link_to "削除", [@shop, comment], method: :delete, 
+                      confirm: "本当に削除しますか？", class: "comment-delete" %>
+                <% end %>
+              </div>
+              <div class="comment-content">
+                <%= simple_format(comment.content) %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="no-comments">まだレビューがありません。</p>
+      <% end %>
+    </div>
+    
+    <div class="shop-actions">
+      <%= link_to "一覧に戻る", shops_path, class: "btn btn-secondary" %>
+    </div>
+  </div>
+<% else %>
+  <div class="error-message">
+    <p>ショップが見つかりませんでした。</p>
+    <%= link_to "一覧に戻る", shops_path, class: "btn btn-primary" %>
+  </div>
 <% end %>

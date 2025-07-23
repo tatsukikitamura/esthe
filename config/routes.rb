@@ -1,11 +1,11 @@
 Rails.application.routes.draw do
-  resources :shops,only: [:index]
-  get 'users/index'
-  get 'users/show'
-  get 'users/edit'
+  resources :shops, only: [:index, :show] do
+    resources :shop_comments, only: [:create, :destroy]
+  end
   root to: 'homes#top'
   get 'homes/top'
   devise_for :users
+  resources :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
