@@ -20,6 +20,8 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-container {
@@ -29,6 +31,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .navbar-brand {
@@ -36,16 +40,19 @@
   text-decoration: none;
   font-size: 1.5rem;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .navbar-brand:hover {
   color: #ddd;
+  text-decoration: none;
 }
 
 .navbar-menu {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .navbar-link {
@@ -57,8 +64,9 @@
   border: none;
   background: none;
   cursor: pointer;
-  font-size: inherit;
+  font-size: 0.9rem;
   font-family: inherit;
+  white-space: nowrap;
 }
 
 .navbar-link:hover {
@@ -66,10 +74,42 @@
   color: white;
 }
 
+/* フラッシュメッセージのスタイルも調整 */
+.flash-notice, .flash-alert {
+  margin: 0 auto 1rem auto;
+  max-width: 1200px;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.flash-notice {
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  border: 1px solid #c3e6cb;
+  color: #155724;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+}
+
+.flash-alert {
+  background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+}
+
 .main-content {
   padding: 2rem 1rem;
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Shops styling */
@@ -465,83 +505,253 @@
 /* Comment form styling */
 .comment-form-section {
   margin: 2rem 0;
-  padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .comment-form-section h2 {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   color: #333;
+  text-align: center;
+  font-size: 1.5rem;
 }
 
-/* Comments section styling */
-.comments-section {
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: white;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.rating-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.character-count {
+  display: block;
+  text-align: right;
+  margin-top: 0.25rem;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.form-actions {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.submit-review {
+  padding: 0.875rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.submit-review:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.login-prompt {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #dee2e6;
   margin: 2rem 0;
 }
 
-.comments-section h2 {
+.login-prompt p {
   margin-bottom: 1rem;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.btn-outline-primary {
+  background-color: transparent;
+  border: 2px solid #007bff;
+  color: #007bff;
+}
+
+.btn-outline-primary:hover {
+  background-color: #007bff;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Comments section styling - 改善版 */
+.comments-section {
+  margin: 3rem 0;
+}
+
+.comments-section h2 {
+  margin-bottom: 1.5rem;
   color: #333;
-  border-bottom: 2px solid #007bff;
+  font-size: 1.75rem;
+  border-bottom: 3px solid #007bff;
   padding-bottom: 0.5rem;
+  text-align: center;
 }
 
 .comments-list {
-  space-y: 1rem;
+  margin-top: 1.5rem;
 }
 
 .comment-item {
   background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.comment-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .comment-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #eee;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.comment-user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .comment-user {
-  font-weight: bold;
+  font-weight: 600;
   color: #333;
+  font-size: 1rem;
 }
 
 .comment-rating {
   color: #ffc107;
-  font-weight: bold;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.rating-number {
+  color: #666;
+  font-size: 0.9rem;
+  margin-left: 0.25rem;
+}
+
+.comment-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .comment-date {
-  color: #666;
-  font-size: 0.9rem;
+  color: #888;
+  font-size: 0.875rem;
 }
 
 .comment-delete {
   color: #dc3545;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
 }
 
 .comment-delete:hover {
-  text-decoration: underline;
+  background-color: #f8d7da;
+  text-decoration: none;
 }
 
 .comment-content {
-  color: #333;
-  line-height: 1.5;
+  color: #555;
+  line-height: 1.6;
+  font-size: 1rem;
 }
 
 .no-comments {
   text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 12px;
   color: #666;
-  font-style: italic;
-  padding: 2rem;
 }
+
+.no-comments-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.no-comments p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.no-comments p:first-of-type {
+  font-weight: 600;
+  color: #555;
+}
+
+/* Error messages styling */
+.error-messages {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.error-messages h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.error-messages ul {
+  margin-bottom: 0;
+  padding-left: 1.5rem;
+}
+
+.error-messages li {
+  margin-bottom: 0.25rem;
+}
+
+/* ...existing code... */

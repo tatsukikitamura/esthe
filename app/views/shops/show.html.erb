@@ -49,59 +49,91 @@
     </div>
 
     <!-- コメント投稿フォーム -->
-    <% if user_signed_in? %>
-      <div class="comment-form-section">
-        <h2>レビューを投稿</h2>
-        <%= form_with model: [@shop, @shop_comment],method: :post, local: true do |f| %>
-          <div class="form-group">
-            <%= f.label :rating, "評価", class: "form-label" %>
-            <%= f.select :rating, options_for_select((1..5).map{ |i| ["★" * i, i] }), { prompt: "評価を選択してください" }, { class: "form-control" } %>
-          </div>
-          
-          <div class="form-group">
-            <%= f.label :content, "コメント", class: "form-label" %>
-            <%= f.text_area :content, rows: 4, class: "form-control", placeholder: "ショップについてのコメントをお書きください" %>
-          </div>
-          
-          <%= f.submit "投稿する", class: "btn btn-primary" %>
-        <% end %>
+    <!-- コメント投稿フォーム -->
+<% if user_signed_in? %>
+  <div class="comment-form-section">
+    <h2>レビューを投稿</h2>
+    <%= form_with model: [@shop, @shop_comment], local: true do |f| %>
+      <% if @shop_comment&.errors&.any? %>
+        <div class="error-messages">
+          <h4><%= pluralize(@shop_comment.errors.count, "件のエラー") %>があります:</h4>
+          <ul>
+            <% @shop_comment.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      
+      <div class="form-group">
+        <%= f.label :rating, "評価", class: "form-label" %>
+        <%= f.select :rating, options_for_select((1..5).map{ |i| ["★" * i + " (#{i})", i] }), 
+            { prompt: "評価を選択してください" }, 
+            { class: "form-control rating-select" } %>
+      </div>
+      
+      <div class="form-group">
+        <%= f.label :content, "コメント", class: "form-label" %>
+        <%= f.text_area :content, rows: 4, class: "form-control", 
+            placeholder: "ショップについてのコメントをお書きください（最大500文字）",
+            maxlength: 500 %>
+        <small class="character-count">0/500文字</small>
+      </div>
+      
+      <div class="form-actions">
+        <%= f.submit "投稿する", class: "btn btn-primary submit-review" %>
       </div>
     <% end %>
+  </div>
+<% else %>
+  <div class="login-prompt">
+    <p>レビューを投稿するにはログインが必要です。</p>
+    <%= link_to "ログイン", new_user_session_path, class: "btn btn-outline-primary" %>
+  </div>
+<% end %>
 
-    <!-- コメント一覧 -->
-    <div class="comments-section">
-      <h2>レビュー一覧</h2>
-      <% if @shop.shop_comments.any? %>
-        <div class="comments-list">
-          <% @shop.shop_comments.order(created_at: :desc).each do |comment| %>
-            <div class="comment-item">
-              <div class="comment-header">
-                <span class="comment-user"><%= comment.user.name %></span>
-                <span class="comment-rating">★<%= comment.rating %></span>
-                <span class="comment-date"><%= comment.created_at.strftime("%Y年%m月%d日") %></span>
-                <% if current_user == comment.user %>
-                  <%= link_to "削除", [@shop, comment], method: :delete, 
-                      confirm: "本当に削除しますか？", class: "comment-delete" %>
-                <% end %>
-              </div>
-              <div class="comment-content">
-                <%= simple_format(comment.content) %>
-              </div>
+<!-- コメント一覧 -->
+<div class="comments-section">
+  <h2>レビュー一覧</h2>
+  <% if @shop.shop_comments.any? %>
+    <div class="comments-list">
+      <% @shop.shop_comments.order(created_at: :desc).each do |comment| %>
+        <div class="comment-item">
+          <div class="comment-header">
+            <div class="comment-user-info">
+              <span class="comment-user"><%= comment.user.name || "匿名ユーザー" %></span>
+              <span class="comment-rating">
+                <% comment.rating.times do %>★<% end %>
+                <span class="rating-number">(<%= comment.rating %>)</span>
+              </span>
             </div>
-          <% end %>
+            <div class="comment-meta">
+              <span class="comment-date"><%= comment.created_at.strftime("%Y年%m月%d日") %></span>
+              <% if current_user == comment.user %>
+                <%= link_to "削除", [@shop, comment], method: :delete, 
+                    confirm: "本当に削除しますか？", 
+                    class: "comment-delete" %>
+              <% end %>
+            </div>
+          </div>
+          <div class="comment-content">
+            <%= simple_format(comment.content) %>
+          </div>
         </div>
-      <% else %>
-        <p class="no-comments">まだレビューがありません。</p>
       <% end %>
     </div>
+  <% else %>
+    <div class="no-comments">
+      <div class="no-comments-icon">💬</div>
+      <p>まだレビューがありません。</p>
+      <p>最初のレビューを投稿してみませんか？</p>
+    </div>
+  <% end %>
+</div>
     
     <div class="shop-actions">
       <%= link_to "一覧に戻る", shops_path, class: "btn btn-secondary" %>
     </div>
   </div>
-<% else %>
-  <div class="error-message">
-    <p>ショップが見つかりませんでした。</p>
-    <%= link_to "一覧に戻る", shops_path, class: "btn btn-primary" %>
-  </div>
 <% end %>
+

@@ -13,6 +13,6 @@ class Shop < ApplicationRecord
   # 平均評価を計算するメソッド
   def average_rating
     return 0 if shop_comments.empty?
-    shop_comments.average(:rating).round(1)
+    shop_comments.average(:rating)
   end
 end
