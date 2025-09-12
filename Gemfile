@@ -11,6 +11,7 @@ gem "sprockets-rails"
 # Use sqlite3 as the database for Active Record
 
 
+
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 
@@ -79,3 +80,8 @@ end
 group :development, :test do
   gem 'sqlite3'
 end
+
+gem "faraday"
+gem "redcarpet"
+
+gem 'dotenv-rails', groups: [:development, :test]

@@ -1,7 +1,72 @@
 <div class="shops-container">
-  <h1 class="page-title">ショップ一覧</h1>
+  <h1 class="page-title">エステサロン検索</h1>
+  
+  <!-- 検索フォーム -->
+  <%= form_with url: shops_path, method: :get, local: true, class: "search-form" do |form| %>
+    <div class="search-input-group">
+      <%= form.text_field :search, placeholder: "キーワードを入力", value: params[:search], class: "search-input" %>
+      <%= form.submit "検索", class: "search-button" %>
+    </div>
+  <% end %>
   
   <% if @shops.present? %>
+    <!-- API検索結果の表示 -->
+    <% if @shops.is_a?(Hash) %>
+      <% if @shops['status'] == 'OK' && @shops['results'].present? %>
+      <div class="api-results">
+        <h2>検索結果 (<%= @shops['results'].length %>件)</h2>
+        <div class="api-shops-list">
+          <% @shops['results'].each_with_index do |place, index| %>
+            <div class="api-shop-item">
+              <div class="shop-info">
+                <h3 class="shop-name">
+                  <%= link_to place['name'], shop_path(id: "api_#{index}", place_id: place['place_id'], name: place['name'], rating: place['rating'], address: place['formatted_address'], price_level: place['price_level'], user_ratings_total: place['user_ratings_total'], search: params[:search]), 
+                      class: "shop-name-link" %>
+                </h3>
+                <% if place['rating'] %>
+                  <div class="shop-rating">
+                    <span class="stars">★</span>
+                    <span class="rating-value"><%= place['rating'] %></span>
+                    <% if place['user_ratings_total'] %>
+                      <span class="rating-count">(<%= place['user_ratings_total'] %>件)</span>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <% elsif @shops['status'] == 'ZERO_RESULTS' %>
+        <div class="no-results">
+          <div class="no-results-icon">🔍</div>
+          <h2>検索結果が見つかりませんでした</h2>
+          <p>キーワードを変更して再度検索してください。</p>
+        </div>
+      <% elsif @shops['status'] == 'OVER_QUERY_LIMIT' %>
+        <div class="api-error">
+          <div class="error-icon">⚠️</div>
+          <h2>API制限に達しました</h2>
+          <p>しばらく時間をおいてから再度お試しください。</p>
+        </div>
+      <% elsif @shops['status'] == 'REQUEST_DENIED' %>
+        <div class="api-error">
+          <div class="error-icon">❌</div>
+          <h2>APIアクセスが拒否されました</h2>
+          <p>APIキーの設定を確認してください。</p>
+        </div>
+      <% else %>
+        <div class="api-error">
+          <div class="error-icon">❌</div>
+          <h2>エラーが発生しました</h2>
+          <p>ステータス: <%= @shops['status'] %></p>
+          <% if @shops['error_message'] %>
+            <p>エラーメッセージ: <%= @shops['error_message'] %></p>
+          <% end %>
+        </div>
+      <% end %>
+    <% elsif @shops.is_a?(Array) && @shops.any? %>
+      <!-- データベースのショップ表示 -->
     <div class="shops-grid">
       <% @shops.each do |shop| %>
         <div class="shop-card">
@@ -24,16 +89,23 @@
           </div>
         </div>
       <% end %>
-    </div>
-    
-    <div class="shops-count">
-      <p>全<%= @shops.count %>件のショップが見つかりました</p>
+      </div>
+      
+      <div class="shops-count">
+        <p>全<%= @shops.count %>件のショップが見つかりました</p>
+      </div>
+    <% end %>
+  <% elsif @shops.nil? %>
+    <div class="api-error">
+      <div class="error-icon">❌</div>
+      <h2>APIエラーが発生しました</h2>
+      <p>サーバーエラーまたはネットワークエラーが発生しました。しばらく時間をおいてから再度お試しください。</p>
     </div>
   <% else %>
-    <div class="no-shops">
-      <div class="no-shops-icon">🏪</div>
-      <h2>ショップが見つかりませんでした</h2>
-      <p>現在登録されているショップはありません。</p>
+    <div class="no-results">
+      <div class="no-results-icon">🔍</div>
+      <h2>検索結果が見つかりませんでした</h2>
+      <p>キーワードを変更して再度検索してください。</p>
     </div>
   <% end %>
 </div>

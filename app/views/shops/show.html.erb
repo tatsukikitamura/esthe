@@ -1,138 +1,311 @@
-<% if @shop.present? %>
+<% if @is_api_data || @shop.present? %>
   <div class="shop-detail-container">
-    <% if @shop.profile_image.attached? %>
-      <div class="shop-profile-image">
-        <%= image_tag @shop.profile_image, alt: @shop.name, class: "shop-main-image" %>
+    <% if @is_api_data %>
+      <!-- APIデータの表示 -->
+      <h1 class="shop-detail-title"><%= @shop_name %></h1>
+      
+      <% if @shop_rating %>
+        <div class="shop-rating google-places-rating">
+          <div class="rating-header">
+            <h3>Google Places 評価</h3>
+          </div>
+          <div class="rating-display">
+            <div class="stars-display">
+              <% rating_value = @shop_rating.to_f %>
+              <% 5.times do |i| %>
+                <% if i < rating_value.floor %>
+                  <span class="star filled">★</span>
+                <% elsif i < rating_value %>
+                  <span class="star half">★</span>
+                <% else %>
+                  <span class="star empty">☆</span>
+                <% end %>
+              <% end %>
+            </div>
+            <div class="rating-details">
+              <span class="rating-value"><%= @shop_rating %></span>
+              <span class="rating-max">/ 5.0</span>
+              <% if @user_ratings_total %>
+                <span class="rating-count">(<%= @user_ratings_total %>件のレビュー)</span>
+              <% end %>
+            </div>
+          </div>
+          <div class="rating-source">
+            <small>データ提供: Google Places API</small>
+          </div>
+        </div>
+      <% end %>
+      
+      <div class="shop-detail-info">
+        <div class="info-item">
+          <strong>ショップ名:</strong>
+          <%= @shop_name %>
+        </div>
+        
+        <div class="info-item">
+          <strong>住所:</strong>
+          <i class="location-icon">📍</i>
+          <%= @shop_address %>
+        </div>
+        
+        <% if @shop_price_level %>
+          <div class="info-item">
+            <strong>価格帯:</strong>
+            <i class="price-icon">💰</i>
+            <%= '¥' * @shop_price_level.to_i %>
+          </div>
+        <% end %>
+        
+        <div class="info-item">
+          <strong>データソース:</strong>
+          <span class="data-source">Google Places API</span>
+        </div>
       </div>
-    <% end %>
-    
-    <h1 class="shop-detail-title"><%= @shop.name %></h1>
-    
-    <div class="shop-rating">
-      <span class="rating-stars">★</span>
-      <span class="rating-value"><%= @shop.average_rating %></span>
-      <span class="rating-count">(<%= @shop.shop_comments.count %>件のレビュー)</span>
-    </div>
-    
-    <div class="shop-detail-info">
-      <div class="info-item">
-        <strong>ショップ名:</strong>
-        <%= @shop.name %>
+
+      <% if @photos && @photos.any? %>
+        <div class="shop-photos">
+          <h2>フォトギャラリー</h2>
+          <div class="photos-grid">
+            <% @photos.first(12).each do |photo| %>
+              <% ref = photo['photo_reference'] %>
+              <% max_width = [photo['width'].to_i, 600].min %>
+              <div class="photo-item">
+                <img src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=<%= max_width %>&photoreference=<%= ref %>&key=<%= ENV['GOOGLE_PLACES_API_KEY'] %>" alt="<%= @shop_name %> の写真" />
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <!-- データベースデータの表示 -->
+      <% if @shop.profile_image.attached? %>
+        <div class="shop-profile-image">
+          <%= image_tag @shop.profile_image, alt: @shop.name, class: "shop-main-image" %>
+        </div>
+      <% end %>
+      
+      <h1 class="shop-detail-title"><%= @shop.name %></h1>
+      
+      <div class="shop-rating">
+        <span class="rating-stars">★</span>
+        <span class="rating-value"><%= @shop.average_rating %></span>
+        <span class="rating-count">(<%= @shop.shop_comments.count %>件のレビュー)</span>
       </div>
       
-      <div class="info-item">
-        <strong>メールアドレス:</strong>
-        <i class="email-icon">📧</i>
-        <%= @shop.email %>
+      <div class="shop-detail-info">
+        <div class="info-item">
+          <strong>ショップ名:</strong>
+          <%= @shop.name %>
+        </div>
+        
+        <div class="info-item">
+          <strong>メールアドレス:</strong>
+          <i class="email-icon">📧</i>
+          <%= @shop.email %>
+        </div>
       </div>
-    </div>
+    <% end %>
 
-    <div class="persons-section">
-      <h2>スタッフ一覧</h2>
-      <% if @shop.persons.any? %>
-        <div class="persons-grid">
-          <% @shop.persons.each do |person| %>
-            <div class="person-card">
-              <% if person.profile_image.attached? %>
-                <div class="person-image">
-                  <%= image_tag person.profile_image, alt: person.name, class: "person-profile-image" %>
-                </div>
-              <% end %>
-              <h3><%= person.name %></h3>
-              <p>年齢: <%= person.age %>歳</p>
+    <% unless @is_api_data %>
+      <div class="persons-section">
+        <h2>スタッフ一覧</h2>
+        <% if @shop.persons.any? %>
+          <div class="persons-grid">
+            <% @shop.persons.each do |person| %>
+              <div class="person-card">
+                <% if person.profile_image.attached? %>
+                  <div class="person-image">
+                    <%= image_tag person.profile_image, alt: person.name, class: "person-profile-image" %>
+                  </div>
+                <% end %>
+                <h3><%= person.name %></h3>
+                <p>年齢: <%= person.age %>歳</p>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="no-persons">スタッフが登録されていません。</p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% unless @is_api_data %>
+      <!-- コメント投稿フォーム -->
+      <% if user_signed_in? %>
+        <div class="comment-form-section">
+          <h2>レビューを投稿</h2>
+          <%= form_with model: [@shop, @shop_comment], local: true do |f| %>
+            <% if @shop_comment&.errors&.any? %>
+              <div class="error-messages">
+                <h4><%= pluralize(@shop_comment.errors.count, "件のエラー") %>があります:</h4>
+                <ul>
+                  <% @shop_comment.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+            
+            <div class="form-group">
+              <%= f.label :rating, "評価", class: "form-label" %>
+              <%= f.select :rating, options_for_select((1..5).map{ |i| ["★" * i + " (#{i})", i] }), 
+                  { prompt: "評価を選択してください" }, 
+                  { class: "form-control rating-select" } %>
+            </div>
+            
+            <div class="form-group">
+              <%= f.label :content, "コメント", class: "form-label" %>
+              <%= f.text_area :content, rows: 4, class: "form-control", 
+                  placeholder: "ショップについてのコメントをお書きください（最大500文字）",
+                  maxlength: 500 %>
+              <small class="character-count">0/500文字</small>
+            </div>
+            
+            <div class="form-actions">
+              <%= f.submit "投稿する", class: "btn btn-primary submit-review" %>
             </div>
           <% end %>
         </div>
       <% else %>
-        <p class="no-persons">スタッフが登録されていません。</p>
-      <% end %>
-    </div>
-
-    <!-- コメント投稿フォーム -->
-    <!-- コメント投稿フォーム -->
-<% if user_signed_in? %>
-  <div class="comment-form-section">
-    <h2>レビューを投稿</h2>
-    <%= form_with model: [@shop, @shop_comment], local: true do |f| %>
-      <% if @shop_comment&.errors&.any? %>
-        <div class="error-messages">
-          <h4><%= pluralize(@shop_comment.errors.count, "件のエラー") %>があります:</h4>
-          <ul>
-            <% @shop_comment.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
+        <div class="login-prompt">
+          <p>レビューを投稿するにはログインが必要です。</p>
+          <%= link_to "ログイン", new_user_session_path, class: "btn btn-outline-primary" %>
         </div>
       <% end %>
-      
-      <div class="form-group">
-        <%= f.label :rating, "評価", class: "form-label" %>
-        <%= f.select :rating, options_for_select((1..5).map{ |i| ["★" * i + " (#{i})", i] }), 
-            { prompt: "評価を選択してください" }, 
-            { class: "form-control rating-select" } %>
-      </div>
-      
-      <div class="form-group">
-        <%= f.label :content, "コメント", class: "form-label" %>
-        <%= f.text_area :content, rows: 4, class: "form-control", 
-            placeholder: "ショップについてのコメントをお書きください（最大500文字）",
-            maxlength: 500 %>
-        <small class="character-count">0/500文字</small>
-      </div>
-      
-      <div class="form-actions">
-        <%= f.submit "投稿する", class: "btn btn-primary submit-review" %>
+    <% end %>
+
+    <!-- AI分析による評価まとめ -->
+    <% if @is_api_data %>
+      <div class="ai-analysis-section">
+        <h2>🤖 AI分析による評価まとめ</h2>
+        <div class="ai-analysis-content">
+          <% if @ai_review_summary.present? %>
+            <div class="ai-summary">
+              <%= render_markdown(@ai_review_summary) %>
+            </div>
+            <div class="ai-source">
+              <small>※ この分析はDeepSeek AIがGoogle Placesのレビューを基に自動生成したものです</small>
+            </div>
+          <% else %>
+            <div class="ai-error">
+              <p>⚠️ AI分析を取得できませんでした</p>
+              <p>以下の原因が考えられます：</p>
+              <ul>
+                <li>APIキーが設定されていない</li>
+                <li>ネットワークエラー</li>
+                <li>レビューデータが不足している</li>
+              </ul>
+              <p><small>詳細はログを確認してください</small></p>
+            </div>
+          <% end %>
+        </div>
       </div>
     <% end %>
-  </div>
-<% else %>
-  <div class="login-prompt">
-    <p>レビューを投稿するにはログインが必要です。</p>
-    <%= link_to "ログイン", new_user_session_path, class: "btn btn-outline-primary" %>
-  </div>
-<% end %>
 
-<!-- コメント一覧 -->
-<div class="comments-section">
-  <h2>レビュー一覧</h2>
-  <% if @shop.shop_comments.any? %>
-    <div class="comments-list">
-      <% @shop.shop_comments.order(created_at: :desc).each do |comment| %>
-        <div class="comment-item">
-          <div class="comment-header">
-            <div class="comment-user-info">
-              <span class="comment-user"><%= comment.user.name || "匿名ユーザー" %></span>
-              <span class="comment-rating">
-                <% comment.rating.times do %>★<% end %>
-                <span class="rating-number">(<%= comment.rating %>)</span>
-              </span>
-            </div>
-            <div class="comment-meta">
-              <span class="comment-date"><%= comment.created_at.strftime("%Y年%m月%d日") %></span>
-              <% if current_user == comment.user %>
-                <%= link_to "削除", [@shop, comment], method: :delete, 
-                    confirm: "本当に削除しますか？", 
-                    class: "comment-delete" %>
+    <!-- レビュー一覧 -->
+    <div class="reviews-section">
+      <h2>レビュー一覧</h2>
+      
+      <% if @is_api_data %>
+        <!-- Google Places レビュー -->
+        <% if @place_reviews && @place_reviews.any? %>
+          <div class="google-reviews">
+            <h3>Google Places レビュー</h3>
+            <div class="reviews-list">
+              <% @place_reviews.each do |review| %>
+                <div class="review-item google-review">
+                  <div class="review-header">
+                    <div class="review-user-info">
+                      <span class="review-author">
+                        <% if review['author_name'] %>
+                          <%= review['author_name'] %>
+                        <% else %>
+                          匿名ユーザー
+                        <% end %>
+                      </span>
+                      <div class="review-rating">
+                        <% if review['rating'] %>
+                          <% review['rating'].to_i.times do %>★<% end %>
+                          <% (5 - review['rating'].to_i).times do %>☆<% end %>
+                          <span class="rating-number">(<%= review['rating'] %>)</span>
+                        <% end %>
+                      </div>
+                    </div>
+                    <div class="review-meta">
+                      <span class="review-date">
+                        <% if review['time'] %>
+                          <%= Time.at(review['time']).strftime("%Y年%m月%d日") %>
+                        <% end %>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="review-content">
+                    <% if review['text'] %>
+                      <p><%= review['text'] %></p>
+                    <% else %>
+                      <p class="no-text">レビューテキストはありません</p>
+                    <% end %>
+                  </div>
+                  <% if review['author_url'] %>
+                    <div class="review-source">
+                      <small>Google Places で確認</small>
+                    </div>
+                  <% end %>
+                </div>
               <% end %>
             </div>
           </div>
-          <div class="comment-content">
-            <%= simple_format(comment.content) %>
+        <% else %>
+          <div class="no-reviews">
+            <div class="no-reviews-icon">💬</div>
+            <p>Google Places のレビューはありません。</p>
           </div>
-        </div>
+        <% end %>
+      <% else %>
+        <!-- データベースのコメント -->
+        <% if @shop.shop_comments.any? %>
+          <div class="comments-list">
+            <% @shop.shop_comments.order(created_at: :desc).each do |comment| %>
+              <div class="comment-item">
+                <div class="comment-header">
+                  <div class="comment-user-info">
+                    <span class="comment-user"><%= comment.user.name || "匿名ユーザー" %></span>
+                    <span class="comment-rating">
+                      <% comment.rating.times do %>★<% end %>
+                      <span class="rating-number">(<%= comment.rating %>)</span>
+                    </span>
+                  </div>
+                  <div class="comment-meta">
+                    <span class="comment-date"><%= comment.created_at.strftime("%Y年%m月%d日") %></span>
+                    <% if current_user == comment.user %>
+                      <%= link_to "削除", [@shop, comment], method: :delete, 
+                          confirm: "本当に削除しますか？", 
+                          class: "comment-delete" %>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="comment-content">
+                  <%= simple_format(comment.content) %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="no-comments">
+            <div class="no-comments-icon">💬</div>
+            <p>まだレビューがありません。</p>
+            <p>最初のレビューを投稿してみませんか？</p>
+          </div>
+        <% end %>
       <% end %>
     </div>
-  <% else %>
-    <div class="no-comments">
-      <div class="no-comments-icon">💬</div>
-      <p>まだレビューがありません。</p>
-      <p>最初のレビューを投稿してみませんか？</p>
-    </div>
-  <% end %>
-</div>
     
     <div class="shop-actions">
-      <%= link_to "一覧に戻る", shops_path, class: "btn btn-secondary" %>
+      <% if @search_query.present? %>
+        <%= link_to "一覧に戻る", shops_path(search: @search_query), class: "btn btn-secondary" %>
+      <% else %>
+        <%= link_to "一覧に戻る", shops_path, class: "btn btn-secondary" %>
+      <% end %>
     </div>
   </div>
 <% end %>
