@@ -187,15 +187,16 @@
               <small>※ この分析はDeepSeek AIがGoogle Placesのレビューを基に自動生成したものです</small>
             </div>
           <% else %>
-            <div class="ai-error">
-              <p>⚠️ AI分析を取得できませんでした</p>
-              <p>以下の原因が考えられます：</p>
-              <ul>
-                <li>APIキーが設定されていない</li>
-                <li>ネットワークエラー</li>
-                <li>レビューデータが不足している</li>
-              </ul>
-              <p><small>詳細はログを確認してください</small></p>
+            <div class="ai-analyze-action">
+              <button id="analyzeBtn" class="btn btn-primary" onclick="startAIAnalysis()">
+                🤖 AI分析を実行
+              </button>
+              <div id="analyzeStatus" class="analyze-status" style="display: none;">
+                分析中... しばらくお待ちください
+              </div>
+            </div>
+            <div class="ai-hint">
+              <p>💡 ボタンをクリックすると、Google Placesのレビューを基にAIが店舗の評価を分析します</p>
             </div>
           <% end %>
         </div>
@@ -309,4 +310,68 @@
     </div>
   </div>
 <% end %>
+
+<script>
+function startAIAnalysis() {
+  const button = document.getElementById('analyzeBtn');
+  const status = document.getElementById('analyzeStatus');
+  const aiContent = document.querySelector('.ai-analysis-content');
+  
+  // ボタンを無効化し、進行状況を表示
+  button.disabled = true;
+  button.textContent = '分析中...';
+  status.style.display = 'block';
+  
+  // リクエストパラメータを準備
+  const params = new URLSearchParams();
+  params.append('place_id', '<%= @place_id %>');
+  params.append('name', '<%= @shop_name %>');
+  params.append('address', '<%= @shop_address %>');
+  
+  // AJAXでAI分析を実行
+  fetch('<%= analyze_ai_shop_path(id: params[:id]) %>', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+    },
+    body: params
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // 成功時：分析結果を表示（サーバー側でMarkdown→HTML変換済み）
+      aiContent.innerHTML = `
+        <div class="ai-summary">${data.summary_html}</div>
+        <div class="ai-source">
+          <small>※ この分析はDeepSeek AIがGoogle Placesのレビューを基に自動生成したものです</small>
+        </div>
+      `;
+    } else {
+      // エラー時：エラーメッセージを表示
+      aiContent.innerHTML = `
+        <div class="ai-error">
+          <p>⚠️ AI分析に失敗しました</p>
+          <p>${data.error}</p>
+        </div>
+      `;
+    }
+  })
+  .catch(error => {
+    // ネットワークエラー時
+    aiContent.innerHTML = `
+      <div class="ai-error">
+        <p>⚠️ ネットワークエラーが発生しました</p>
+        <p>しばらく時間をおいてから再度お試しください。</p>
+      </div>
+    `;
+  })
+  .finally(() => {
+    // ボタンを元に戻す
+    button.disabled = false;
+    button.textContent = '🤖 AI分析を実行';
+    status.style.display = 'none';
+  });
+}
+</script>
 

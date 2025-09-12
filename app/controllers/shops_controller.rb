@@ -35,15 +35,7 @@ class ShopsController < ApplicationController
           @place_reviews = result['reviews'] if result['reviews']
           @opening_hours = result['opening_hours'] if result['opening_hours']
           @photos = result['photos'] if result['photos']
-          
-          # DeepSeek APIでレビュー分析を実行
-          if @place_reviews && @place_reviews.any?
-            @ai_review_summary = DeepseekApiService.analyze_shop_reviews(
-              @shop_name, 
-              @shop_address, 
-              @place_reviews
-            )
-          end
+          # ここではAI分析を自動実行しない（ボタン押下時に非同期で実行）
         end
       end
       
@@ -56,5 +48,53 @@ class ShopsController < ApplicationController
       @shop_comment = ShopComment.new if user_signed_in?
       @shop_comments = @shop.shop_comments.order(created_at: :desc)
     end
+  end
+
+  def analyze_ai
+    if params[:id].start_with?('api_')
+      @place_id = params[:place_id]
+      @shop_name = params[:name]
+      @shop_address = params[:address]
+      
+      # レビューを再取得
+      merged_reviews = ShopApiService.get_place_reviews_merged(@place_id)
+      
+      if merged_reviews.any?
+        @ai_review_summary = DeepseekApiService.analyze_shop_reviews(
+          @shop_name, 
+          @shop_address, 
+          merged_reviews
+        )
+        
+        if @ai_review_summary.present?
+          summary_html = ApplicationController.helpers.render_markdown(@ai_review_summary)
+          render json: { 
+            success: true, 
+            summary_html: summary_html 
+          }
+        else
+          render json: { 
+            success: false, 
+            error: "AI分析に失敗しました。APIキーまたはネットワークを確認してください。" 
+          }
+        end
+      else
+        render json: { 
+          success: false, 
+          error: "レビューデータが見つかりませんでした。" 
+        }
+      end
+    else
+      render json: { 
+        success: false, 
+        error: "この機能はAPIデータでのみ利用可能です。" 
+      }
+    end
+  rescue StandardError => e
+    Rails.logger.error "AI analysis error: #{e.message}"
+    render json: { 
+      success: false, 
+      error: "予期しないエラーが発生しました: #{e.message}" 
+    }
   end
 end

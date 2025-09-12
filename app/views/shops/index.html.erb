@@ -102,10 +102,39 @@
       <p>サーバーエラーまたはネットワークエラーが発生しました。しばらく時間をおいてから再度お試しください。</p>
     </div>
   <% else %>
-    <div class="no-results">
-      <div class="no-results-icon">🔍</div>
-      <h2>検索結果が見つかりませんでした</h2>
-      <p>キーワードを変更して再度検索してください。</p>
-    </div>
+    <% if defined?(@recommended_shops) && @recommended_shops.present? %>
+      <div class="recommended-section">
+        <h2>おすすめの店舗</h2>
+        <div class="shops-grid">
+          <% @recommended_shops.each do |shop| %>
+            <div class="shop-card">
+              <div class="shop-header">
+                <% if shop.profile_image.attached? %>
+                  <div class="shop-image">
+                    <%= image_tag shop.profile_image, alt: shop.name, class: "profile-image" %>
+                  </div>
+                <% end %>
+                <h3 class="shop-name"><%= link_to shop.name, shop_path(shop) %></h3>
+              </div>
+              <div class="shop-body">
+                <p class="shop-email">
+                  <i class="email-icon">📧</i>
+                  <%= shop.email %>
+                </p>
+                <% if shop.respond_to?(:average_rating) && shop.average_rating.present? %>
+                  <p class="shop-rating">★ <%= shop.average_rating %></p>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="no-results">
+        <div class="no-results-icon">🔍</div>
+        <h2>検索結果が見つかりませんでした</h2>
+        <p>キーワードを変更して再度検索してください。</p>
+      </div>
+    <% end %>
   <% end %>
 </div>
