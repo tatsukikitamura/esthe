@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   resources :shops, only: [:index, :show] do
     resources :shop_comments, only: [:create, :destroy]
+    member do
+      post :analyze_ai
+    end
   end
   root to: 'homes#top'
   get 'homes/top'
