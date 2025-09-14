@@ -2,9 +2,11 @@ class ShopsController < ApplicationController
   def index
     if params[:search].present?
       @shops = ShopApiService.search_esthe_salons(params[:search])
+      @has_searched = true
       # ⚠️ データ構造に合わせて、必要であればデータを加工する
     else
       @shops = []
+      @has_searched = false
     end
   end
 
