@@ -5,7 +5,7 @@ class ShopApiService
     def self.search_esthe_salons(query, location = "35.6895,139.6917", radius = "5000") # 東京駅周辺をデフォルトとする
       api_key = ENV['GOOGLE_PLACES_API_KEY']
       response = Faraday.get(API_URL) do |req|
-        req.params['query'] = "#{query} エステ" # 検索キーワードに「エステ」を追加
+        req.params['query'] = "#{query} ショップ" # 検索キーワードに「エステ」を追加
         req.params['location'] = location # 緯度と経度
         req.params['radius'] = radius # 検索範囲（メートル）
         req.params['key'] = api_key
