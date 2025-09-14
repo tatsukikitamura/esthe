@@ -5,7 +5,7 @@ Rails.application.routes.draw do
       post :analyze_ai
     end
   end
-  root to: 'homes#top'
+  root to: 'shops#index'
   get 'homes/top'
   devise_for :users
   resources :users
