@@ -1,6 +1,6 @@
 # README
 
-https://esthe-search.com
+https://www.esthe-search.com
 
 https://esthe-rails-ddbc389b38a9.herokuapp.com/shops?
 
