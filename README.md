@@ -1,6 +1,6 @@
 # README
 
-https://www.esthe-search.com/shops?search=&commit by=検索
+https://www.esthe-search.com/shops?search=&commit=検索
 
 https://esthe-rails-ddbc389b38a9.herokuapp.com/shops?
 
