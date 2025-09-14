@@ -1,6 +1,7 @@
 # README
 
-esthe-search.com
+https://esthe-search.com
+
 https://esthe-rails-ddbc389b38a9.herokuapp.com/shops?
 
 This README would normally document whatever steps are necessary to get the
