@@ -20,17 +20,28 @@
           <div class="api-shops-list">
             <% @shops['results'].each_with_index do |place, index| %>
               <div class="api-shop-item">
-                <div class="shop-info">
-                  <h3 class="shop-name">
-                    <%= link_to place['name'], shop_path(id: "api_#{index}", place_id: place['place_id'], name: place['name'], rating: place['rating'], address: place['formatted_address'], price_level: place['price_level'], user_ratings_total: place['user_ratings_total'], search: params[:search]), 
-                        class: "shop-name-link" %>
-                  </h3>
+                <div class="shop-info" style="display: flex; flex-direction: column; gap: 8px;">
+                  <div class="shop-row" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <h3 class="shop-name" style="border-bottom: none; margin: 0;">
+                      <%= link_to place['name'], shop_path(id: "api_#{index}", place_id: place['place_id'], name: place['name'], rating: place['rating'], address: place['formatted_address'], price_level: place['price_level'], user_ratings_total: place['user_ratings_total'], search: params[:search]), 
+                          class: "shop-name-link", style: "text-decoration: none; border-bottom: none;" %>
+                    </h3>
+                    <% if place['photos'].present? %>
+                      <div class="shop-thumbs" style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+                        <% place['photos'].first(3).each do |photo| %>
+                          <% ref = photo['photo_reference'] %>
+                          <% max_width = [photo['width'].to_i, 80].min %>
+                          <img src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=<%= max_width %>&photoreference=<%= ref %>&key=<%= ENV['GOOGLE_PLACES_API_KEY'] %>" alt="<%= place['name'] %> の写真" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px;" />
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
                   <% if place['rating'] %>
-                    <div class="shop-rating">
+                    <div class="shop-rating" style="font-size: 16px;">
                       <span class="stars">★</span>
-                      <span class="rating-value"><%= place['rating'] %></span>
+                      <span class="rating-value" style="font-weight: 700;">&nbsp;<%= place['rating'] %></span>
                       <% if place['user_ratings_total'] %>
-                        <span class="rating-count">(<%= place['user_ratings_total'] %>件)</span>
+                        <span class="rating-count" style="color: #666;">&nbsp;(<%= place['user_ratings_total'] %>件)</span>
                       <% end %>
                     </div>
                   <% end %>
@@ -118,7 +129,7 @@
                   <%= image_tag shop.profile_image, alt: shop.name, class: "profile-image" %>
                 </div>
               <% end %>
-              <h3 class="shop-name"><%= shop.name %></h3>
+              <h3 class="shop-name" style="border-bottom: none;"><%= shop.name %></h3>
             </div>
             <div class="shop-body">
               <p class="shop-email">
@@ -154,12 +165,7 @@
     <!-- ようこそ画面（検索前の初期状態） -->
     <div class="welcome-section">
       <div class="welcome-content">
-        <div class="welcome-icon">✨</div>
-        <h2>エステサロン検索へようこそ</h2>
-        <p class="welcome-description">
-          お気に入りのエステサロンを見つけましょう。<br>
-          キーワードを入力して検索を開始してください。
-        </p>
+        
         <div class="welcome-features">
           <div class="feature-item">
             <div class="feature-icon">🔍</div>

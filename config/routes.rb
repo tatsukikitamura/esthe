@@ -1,14 +1,20 @@
 Rails.application.routes.draw do
   resources :shops, only: [:index, :show] do
     resources :shop_comments, only: [:create, :destroy]
+    resource :like, only: [:create, :destroy]
     member do
       post :analyze_ai
     end
   end
-  root to: 'shops#index'
+  get 'shops/search', to: 'shops#search', as: :shops_search
+  root to: 'shops#search'
   get 'homes/top'
   devise_for :users
-  resources :users
+  resources :users do
+    collection do
+      get :likes
+    end
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

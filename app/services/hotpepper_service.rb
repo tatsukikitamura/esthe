@@ -36,7 +36,7 @@ class HotpepperService
       '',
       query: {
         key: api_key,
-        name: shop_name,
+        keyword: shop_name,
         format: 'json',
         count: 20
       }
@@ -64,7 +64,7 @@ class HotpepperService
     Rails.logger.info "HotpepperService: #{search_type} - Response body: #{response.body}"
     
     if response.success?
-      parsed_response = response.parsed_response
+      parsed_response = JSON.parse(response.body)
       Rails.logger.info "HotpepperService: #{search_type} - Parsed response: #{parsed_response}"
       
       # エラーレスポンスのチェック

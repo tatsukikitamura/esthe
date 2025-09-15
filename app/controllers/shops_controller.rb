@@ -1,4 +1,10 @@
 class ShopsController < ApplicationController
+  def search
+    # 検索未実行の初期表示用。index と同じビュー構成に合わせるためのフラグのみ設定
+    @shops = []
+    @has_searched = false
+    render :search
+  end
   def index
     if params[:search].present?
       # ページネーション対応の検索（遅延取得: 指定ページの20件のみ）

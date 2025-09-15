@@ -84,6 +84,13 @@
           </div>
         </div>
       <% end %>
+      <div class="shop-actions" style="margin: 10px 0;">
+        <% if user_signed_in? %>
+          <span style="color:#666; font-size: 14px;">※ 現在、いいねはデータベース登録のショップで利用できます</span>
+        <% else %>
+          <%= link_to "ログインしていいねする", new_user_session_path, class: "btn btn-primary" %>
+        <% end %>
+      </div>
     <% else %>
       <!-- データベースデータの表示 -->
       <% if @shop.profile_image.attached? %>
@@ -98,6 +105,17 @@
         <span class="rating-stars">★</span>
         <span class="rating-value"><%= @shop.average_rating %></span>
         <span class="rating-count">(<%= @shop.shop_comments.count %>件のレビュー)</span>
+      </div>
+      <div class="shop-actions" style="margin: 10px 0;">
+        <% if user_signed_in? %>
+          <% if current_user.liked_shops.exists?(@shop.id) %>
+            <%= button_to "いいね解除", shop_like_path(@shop), method: :delete, class: "btn btn-secondary" %>
+          <% else %>
+            <%= button_to "いいね", shop_like_path(@shop), method: :post, class: "btn btn-primary" %>
+          <% end %>
+        <% else %>
+          <%= link_to "ログインしていいねする", new_user_session_path, class: "btn btn-primary" %>
+        <% end %>
       </div>
       
       <div class="shop-detail-info">
@@ -212,15 +230,7 @@
     <% end %>
 
     <!-- Hotpepper情報 -->
-    <!-- Debug info -->
-    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border: 1px solid #ccc;">
-      <strong>Debug Info:</strong><br>
-      @hotpepper_shops: <%= @hotpepper_shops.inspect %><br>
-      @hotpepper_shops class: <%= @hotpepper_shops.class %><br>
-      @hotpepper_shops present?: <%= @hotpepper_shops.present? %><br>
-      @hotpepper_shops any?: <%= @hotpepper_shops&.any? %><br>
-      @hotpepper_shops size: <%= @hotpepper_shops&.size %><br>
-    </div>
+    
     
     <% if @hotpepper_shops && @hotpepper_shops.any? %>
       <div class="hotpepper-section">
@@ -257,11 +267,7 @@
                   </div>
                 <% end %>
                 
-                <% if shop['budget']['name'] %>
-                  <div class="hotpepper-budget">
-                    <strong>予算:</strong> <%= shop['budget']['name'] %>
-                  </div>
-                <% end %>
+                
                 
                 <% if shop['access'] %>
                   <div class="hotpepper-access">

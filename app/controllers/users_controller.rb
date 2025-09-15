@@ -27,6 +27,11 @@ class UsersController < ApplicationController
     redirect_to root_path
   end
 
+  def likes
+    authenticate_user!
+    @liked_shops = current_user.liked_shops.includes(:persons)
+  end
+
   private
 
   def user_params

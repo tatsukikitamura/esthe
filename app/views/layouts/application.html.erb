@@ -215,8 +215,163 @@
         display: block;
       }
       
+      /* 検索/一覧 共通レイアウトの統一 */
+      .api-shops-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .api-shop-item {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 14px 16px;
+        transition: box-shadow .15s ease, transform .05s ease;
+      }
+
+      .api-shop-item:hover {
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      }
+
+      .shop-name-link {
+        color: #2c3e50;
+        font-size: 18px;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .shop-name-link:hover {
+        color: #1f6fb2;
+      }
+
+      .shop-thumbs img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      }
+
+      .shop-rating {
+        color: #2c3e50;
+      }
+
+      .shop-rating .stars {
+        color: #f1c40f;
+      }
+
+      .shop-rating .rating-value {
+        font-weight: 700;
+      }
+
+      .pagination-links .pagination-link,
+      .pagination-links .prev-link,
+      .pagination-links .next-link {
+        text-decoration: none;
+      }
+
+      /* search welcome カードの統一 */
+      .feature-item {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 16px;
+        transition: box-shadow .15s ease, transform .05s ease;
+      }
+
+      .feature-card-link {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .feature-card-link:hover,
+      .feature-item:hover {
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      }
+
+      .feature-icon {
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+
+      .welcome-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      /* Auth forms unified style */
+      .auth-container {
+        max-width: 520px;
+        margin: 20px auto;
+      }
+      .auth-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 20px 22px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+      }
+      .auth-title {
+        margin: 0 0 14px;
+        font-size: 22px;
+        color: #2c3e50;
+      }
+      .auth-form .field {
+        margin-bottom: 12px;
+      }
+      .auth-form label {
+        display: block;
+        margin-bottom: 6px;
+        color: #2c3e50;
+        font-weight: 600;
+      }
+      .auth-form input[type="email"],
+      .auth-form input[type="password"],
+      .auth-form input[type="text"] {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        outline: none;
+      }
+      .auth-form input:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52,152,219,0.15);
+      }
+      .btn-primary {
+        display: inline-block;
+        background: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 14px;
+        text-decoration: none;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .btn-primary:hover {
+        background: #2d83bc;
+      }
+      .auth-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 10px;
+      }
+      .auth-links {
+        margin-top: 12px;
+        color: #666;
+      }
+
       /* レスポンシブ対応 */
       @media (max-width: 768px) {
+        .api-shop-item { padding: 12px; }
+        .shop-thumbs img { width: 70px; height: 70px; }
         .photos-grid {
           grid-template-columns: repeat(2, 1fr) !important;
           max-width: 100% !important;
@@ -253,7 +408,7 @@
   <body>
     <nav class="navbar">
       <div class="navbar-container">
-        <%= link_to "ショップ", shops_path, class: "navbar-brand" %>
+        <%= link_to "ショップ", root_path, class: "navbar-brand" %>
         
         <div class="navbar-menu">
           <% if user_signed_in? %>
