@@ -16,7 +16,7 @@
       <% if @shops.is_a?(Hash) %>
         <% if @shops['status'] == 'OK' && @shops['results'].present? %>
         <div class="api-results">
-          <h2>検索結果 (<%= @shops['results'].length %>件)</h2>
+          <h2>検索結果 (<%= @shops['total_results'] %>件中 <%= (@shops['current_page'] - 1) * @shops['per_page'] + 1 %>-<%= [(@shops['current_page'] - 1) * @shops['per_page'] + @shops['results'].length, @shops['total_results']].min %>件)</h2>
           <div class="api-shops-list">
             <% @shops['results'].each_with_index do |place, index| %>
               <div class="api-shop-item">
@@ -39,6 +39,46 @@
             <% end %>
           </div>
         </div>
+        
+        <!-- ページネーション（一番下に表示） -->
+        <% if @shops['total_pages'] > 1 %>
+          <div class="pagination-container">
+            <div class="pagination-info">
+              <span>ページ <%= @shops['current_page'] %> / <%= @shops['total_pages'] %></span>
+            </div>
+            <div class="pagination-links">
+              <% if @shops['has_prev_page'] %>
+                <%= link_to shops_path(search: params[:search], page: @shops['current_page'] - 1), 
+                    class: "pagination-link prev-link", title: "前の20件を表示" do %>
+                  <span class="arrow-icon">⬅️</span>
+                  <span>前へ</span>
+                <% end %>
+              <% end %>
+              
+              <% pages_to_show = [1, 2, 3].select { |n| n <= @shops['total_pages'] } %>
+              <% pages_to_show.each do |page_num| %>
+                <% if page_num == @shops['current_page'] %>
+                  <span class="pagination-link current" title="現在のページ"><%= page_num %></span>
+                <% else %>
+                  <%= link_to shops_path(search: params[:search], page: page_num), 
+                      class: "pagination-link", title: "#{page_num}ページ目を表示" do %>
+                    <span><%= page_num %></span>
+                  <% end %>
+                <% end %>
+              <% end %>
+              
+              <% if @shops['has_next_page'] %>
+                <%= link_to shops_path(search: params[:search], page: @shops['current_page'] + 1), 
+                    class: "pagination-link next-link", title: "次の20件を表示" do %>
+                  <span>次へ</span>
+                  <span class="arrow-icon">➡️</span>
+                <% end %>
+              <% end %>
+            </div>
+            
+            <!-- 下向き矢印のナビゲーション -->
+          </div>
+        <% end %>
         <% elsif @shops['status'] == 'ZERO_RESULTS' %>
           <div class="no-results">
             <div class="no-results-icon">🔍</div>

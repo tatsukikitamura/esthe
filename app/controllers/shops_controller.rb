@@ -1,9 +1,25 @@
 class ShopsController < ApplicationController
   def index
     if params[:search].present?
-      @shops = ShopApiService.search_esthe_salons(params[:search])
-      @has_searched = true
-      # ⚠️ データ構造に合わせて、必要であればデータを加工する
+      # ページネーション対応の検索（遅延取得: 指定ページの20件のみ）
+      page = params[:page]&.to_i || 1
+      per_page = 20
+      
+      @search_result = ShopApiService.search_esthe_salons_lazy(
+        params[:search], 
+        page, 
+        per_page
+      )
+      
+      if @search_result
+        @shops = @search_result
+        @has_searched = true
+        @current_page = page
+        @per_page = per_page
+      else
+        @shops = nil
+        @has_searched = true
+      end
     else
       @shops = []
       @has_searched = false
@@ -37,7 +53,24 @@ class ShopsController < ApplicationController
           @place_reviews = result['reviews'] if result['reviews']
           @opening_hours = result['opening_hours'] if result['opening_hours']
           @photos = result['photos'] if result['photos']
+          @phone_number = result['formatted_phone_number'] if result['formatted_phone_number']
           # ここではAI分析を自動実行しない（ボタン押下時に非同期で実行）
+        end
+      end
+      
+      # Hotpepperからの情報を取得
+      if @shop_name.present?
+        begin
+          @hotpepper_shops = HotpepperService.search_shops(@shop_name)
+          # フォールバック検索が使用されたかどうかを判定
+          @hotpepper_fallback_search = @hotpepper_shops.present? && @hotpepper_shops.any? do |shop|
+            # 店名に完全一致するものがない場合はフォールバック検索とみなす
+            shop['name'] && !shop['name'].downcase.include?(@shop_name.downcase)
+          end
+        rescue => e
+          Rails.logger.error "Hotpepper API error: #{e.message}"
+          @hotpepper_shops = nil
+          @hotpepper_fallback_search = false
         end
       end
       
@@ -47,6 +80,23 @@ class ShopsController < ApplicationController
       # データベースデータの場合
       @is_api_data = false
       @shop = Shop.includes(:persons, shop_comments: :user).find(params[:id])
+      
+      # Hotpepperからの情報を取得
+      if @shop.name.present?
+        begin
+          @hotpepper_shops = HotpepperService.search_shops(@shop.name)
+          # フォールバック検索が使用されたかどうかを判定
+          @hotpepper_fallback_search = @hotpepper_shops.present? && @hotpepper_shops.any? do |shop|
+            # 店名に完全一致するものがない場合はフォールバック検索とみなす
+            shop['name'] && !shop['name'].downcase.include?(@shop.name.downcase)
+          end
+        rescue => e
+          Rails.logger.error "Hotpepper API error: #{e.message}"
+          @hotpepper_shops = nil
+          @hotpepper_fallback_search = false
+        end
+      end
+      
       @shop_comment = ShopComment.new if user_signed_in?
       @shop_comments = @shop.shop_comments.order(created_at: :desc)
     end

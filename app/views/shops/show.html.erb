@@ -48,6 +48,14 @@
           <%= @shop_address %>
         </div>
         
+        <% if @phone_number %>
+          <div class="info-item">
+            <strong>電話番号:</strong>
+            <i class="phone-icon">📞</i>
+            <a href="tel:<%= @phone_number %>" class="phone-link"><%= @phone_number %></a>
+          </div>
+        <% end %>
+        
         <% if @shop_price_level %>
           <div class="info-item">
             <strong>価格帯:</strong>
@@ -199,6 +207,98 @@
               <p>💡 ボタンをクリックすると、Google Placesのレビューを基にAIが店舗の評価を分析します</p>
             </div>
           <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Hotpepper情報 -->
+    <!-- Debug info -->
+    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border: 1px solid #ccc;">
+      <strong>Debug Info:</strong><br>
+      @hotpepper_shops: <%= @hotpepper_shops.inspect %><br>
+      @hotpepper_shops class: <%= @hotpepper_shops.class %><br>
+      @hotpepper_shops present?: <%= @hotpepper_shops.present? %><br>
+      @hotpepper_shops any?: <%= @hotpepper_shops&.any? %><br>
+      @hotpepper_shops size: <%= @hotpepper_shops&.size %><br>
+    </div>
+    
+    <% if @hotpepper_shops && @hotpepper_shops.any? %>
+      <div class="hotpepper-section">
+        <h2>🍜 Hotpepper グルメ情報</h2>
+        <% if @hotpepper_fallback_search %>
+          <div class="hotpepper-fallback-notice">
+            <small>※ 直接の店舗名では見つからなかったため、関連する店舗を表示しています</small>
+          </div>
+        <% end %>
+        <div class="hotpepper-shops">
+          <% @hotpepper_shops.first(3).each do |shop| %>
+            <div class="hotpepper-shop-card">
+              <div class="hotpepper-shop-header">
+                <h3><%= shop['name'] %></h3>
+                <% if shop['genre']['name'] %>
+                  <span class="hotpepper-genre"><%= shop['genre']['name'] %></span>
+                <% end %>
+              </div>
+              
+              <div class="hotpepper-shop-info">
+                <% if shop['catch'] %>
+                  <p class="hotpepper-catch"><%= shop['catch'] %></p>
+                <% end %>
+                
+                <% if shop['address'] %>
+                  <div class="hotpepper-address">
+                    <strong>住所:</strong> <%= shop['address'] %>
+                  </div>
+                <% end %>
+                
+                <% if shop['open'] %>
+                  <div class="hotpepper-hours">
+                    <strong>営業時間:</strong> <%= shop['open'] %>
+                  </div>
+                <% end %>
+                
+                <% if shop['budget']['name'] %>
+                  <div class="hotpepper-budget">
+                    <strong>予算:</strong> <%= shop['budget']['name'] %>
+                  </div>
+                <% end %>
+                
+                <% if shop['access'] %>
+                  <div class="hotpepper-access">
+                    <strong>アクセス:</strong> <%= shop['access'] %>
+                  </div>
+                <% end %>
+              </div>
+              
+              <div class="hotpepper-shop-actions">
+                <% if shop['urls']['pc'] %>
+                  <a href="<%= shop['urls']['pc'] %>" target="_blank" class="btn btn-hotpepper">
+                    Hotpepperで詳細を見る
+                  </a>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <div class="hotpepper-source">
+          <small>データ提供: <a href="https://webservice.recruit.co.jp/" target="_blank">ホットペッパーグルメ Webサービス</a></small>
+        </div>
+      </div>
+    <% elsif @hotpepper_shops.nil? %>
+      <div class="hotpepper-section">
+        <h2>🍜 Hotpepper グルメ情報</h2>
+        <div class="hotpepper-error">
+          <p>Hotpepperからの情報を取得できませんでした。</p>
+          <small>APIキーの設定を確認してください。</small>
+        </div>
+      </div>
+    <% elsif @hotpepper_shops.empty? %>
+      <div class="hotpepper-section">
+        <h2>🍜 Hotpepper グルメ情報</h2>
+        <div class="hotpepper-no-results">
+          <p>「<%= @shop_name || @shop&.name %>」に関する情報が見つかりませんでした。</p>
+          <small>別のキーワードで検索してみてください。</small>
         </div>
       </div>
     <% end %>

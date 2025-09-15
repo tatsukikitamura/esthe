@@ -83,5 +83,7 @@ end
 
 gem "faraday"
 gem "redcarpet"
+gem "httparty"
+gem "kaminari"
 
 gem 'dotenv-rails', groups: [:development, :test]
