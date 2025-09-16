@@ -86,7 +86,11 @@
       <% end %>
       <div class="shop-actions" style="margin: 10px 0;">
         <% if user_signed_in? %>
-          <span style="color:#666; font-size: 14px;">※ 現在、いいねはデータベース登録のショップで利用できます</span>
+          <% if current_user.external_likes.exists?(place_id: @place_id) %>
+            <%= button_to "いいね解除", external_likes_path(place_id: @place_id), method: :delete, class: "btn btn-secondary" %>
+          <% else %>
+            <%= button_to "いいね", external_likes_path(place_id: @place_id, name: @shop_name, address: @shop_address, rating: @shop_rating, user_ratings_total: @user_ratings_total), method: :post, class: "btn btn-primary" %>
+          <% end %>
         <% else %>
           <%= link_to "ログインしていいねする", new_user_session_path, class: "btn btn-primary" %>
         <% end %>

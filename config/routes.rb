@@ -6,6 +6,12 @@ Rails.application.routes.draw do
       post :analyze_ai
     end
   end
+  # External likes for API-based shops
+  resources :external_likes, only: [:create] do
+    collection do
+      delete :destroy
+    end
+  end
   get 'shops/search', to: 'shops#search', as: :shops_search
   root to: 'shops#search'
   get 'homes/top'

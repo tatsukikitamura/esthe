@@ -21,11 +21,35 @@
         </div>
       <% end %>
     </div>
+  <% end %>
+  
+  <% if @external_likes.present? %>
+    <div class="shops-grid">
+      <% @external_likes.each do |like| %>
+        <div class="shop-card">
+          <div class="shop-header">
+            <h3 class="shop-name" style="border-bottom:none;"><%= like.name || "名称未取得" %></h3>
+          </div>
+          <div class="shop-body">
+            <div class="shop-meta">
+              <% if like.address.present? %>
+                <p><%= like.address %></p>
+              <% end %>
+              <% if like.rating.present? %>
+                <p>評価: <%= like.rating %> (<%= like.user_ratings_total || 0 %>件)</p>
+              <% end %>
+            </div>
+            <div class="shop-actions">
+              <%= link_to "詳細を見る", shop_path("api_#{like.place_id}", place_id: like.place_id, name: like.name, address: like.address, rating: like.rating, user_ratings_total: like.user_ratings_total), class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
   <% else %>
     <div class="no-results">
       <div class="no-results-icon">💖</div>
-      <h2>まだ「いいね」したショップがありません</h2>
-      <p>気になるショップを見つけて「いいね」してみましょう。</p>
+      <h2>APIのショップで「いいね」したものはありません</h2>
     </div>
   <% end %>
 </div>

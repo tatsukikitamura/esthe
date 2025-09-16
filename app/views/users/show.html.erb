@@ -1,2 +1,61 @@
-<h1>Users#show</h1>
-<p>Find me in app/views/users/show.html.erb</p>
+<div class="shops-container">
+  <h1 class="page-title">マイページ</h1>
+
+  <section class="liked-shops-section">
+    <h2 class="section-title">いいねしたショップ</h2>
+    <% if @liked_shops.present? %>
+      <div class="shops-grid">
+        <% @liked_shops.each do |shop| %>
+          <div class="shop-card">
+            <div class="shop-header">
+              <% if shop.profile_image.attached? %>
+                <div class="shop-image">
+                  <%= image_tag shop.profile_image, alt: shop.name, class: "profile-image" %>
+                </div>
+              <% end %>
+              <h3 class="shop-name" style="border-bottom:none;"><%= shop.name %></h3>
+            </div>
+            <div class="shop-body">
+              <div class="shop-actions">
+                <%= link_to "詳細を見る", shop_path(shop), class: "btn btn-primary" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="liked-shops-section">
+    <h2 class="section-title">APIのショップのいいね</h2>
+    <% if @external_likes.present? %>
+      <div class="shops-grid">
+        <% @external_likes.each do |like| %>
+          <div class="shop-card">
+            <div class="shop-header">
+              <h3 class="shop-name" style="border-bottom:none;"><%= like.name || "名称未取得" %></h3>
+            </div>
+            <div class="shop-body">
+              <div class="shop-meta">
+                <% if like.address.present? %>
+                  <p><%= like.address %></p>
+                <% end %>
+                <% if like.rating.present? %>
+                  <p>評価: <%= like.rating %> (<%= like.user_ratings_total || 0 %>件)</p>
+                <% end %>
+              </div>
+              <div class="shop-actions">
+                <%= link_to "詳細を見る", shop_path("api_#{like.place_id}", place_id: like.place_id, name: like.name, address: like.address, rating: like.rating, user_ratings_total: like.user_ratings_total), class: "btn btn-primary" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="no-results">
+        <div class="no-results-icon">💖</div>
+        <h3>APIのショップで「いいね」したものはありません</h3>
+      </div>
+    <% end %>
+  </section>
+</div>

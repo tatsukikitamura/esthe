@@ -167,19 +167,19 @@
       <div class="welcome-content">
         
         <div class="welcome-features">
-          <div class="feature-item">
+          <%= link_to shops_path, class: "feature-item feature-card-link", style: "text-decoration: none;" do %>
             <div class="feature-icon">🔍</div>
-            <h3>簡単検索</h3>
+            <h3 style="text-decoration: none; border-bottom: none;">検索</h3>
             <p>キーワードでお好みのサロンを検索</p>
-          </div>
+          <% end %>
           <div class="feature-item">
             <div class="feature-icon">⭐</div>
-            <h3>評価確認</h3>
+            <h3>評価確認※実装中</h3>
             <p>口コミと評価でサロンを比較</p>
           </div>
           <div class="feature-item">
             <div class="feature-icon">📍</div>
-            <h3>詳細情報</h3>
+            <h3>詳細情報※実装中</h3>
             <p>住所、営業時間、料金を確認</p>
           </div>
         </div>
