@@ -414,7 +414,6 @@
           <% if user_signed_in? %>
             <%= button_to "ショップ一覧", shops_path, method: :get, class: "navbar-link" %>
             <%= button_to "マイページ", users_path, method: :get, class: "navbar-link" %>
-            <%= button_to "ログアウト", destroy_user_session_path, method: :delete, class: "navbar-link" %>
           <% else %>
             <%= button_to "ログイン", new_user_session_path, method: :get, class: "navbar-link" %>
             <%= button_to "新規登録", new_user_registration_path, method: :get, class: "navbar-link" %>

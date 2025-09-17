@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_09_15_000000) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_16_000000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,20 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_15_000000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "external_likes", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "place_id", null: false
+    t.string "name"
+    t.string "address"
+    t.float "rating"
+    t.integer "user_ratings_total"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["place_id"], name: "index_external_likes_on_place_id"
+    t.index ["user_id", "place_id"], name: "index_external_likes_on_user_id_and_place_id", unique: true
+    t.index ["user_id"], name: "index_external_likes_on_user_id"
   end
 
   create_table "likes", force: :cascade do |t|
@@ -97,6 +111,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_15_000000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "external_likes", "users"
   add_foreign_key "likes", "shops"
   add_foreign_key "likes", "users"
   add_foreign_key "people", "shops"

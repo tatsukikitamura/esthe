@@ -1,11 +1,12 @@
 class UsersController < ApplicationController
-  
+  before_action :authenticate_user!, only: [:show, :edit, :update, :destroy, :likes]
 
   def index
   end
 
   def show
-    @shop = Shop.all
+    @liked_shops = current_user.liked_shops.includes(:persons)
+    @external_likes = current_user.external_likes
   end
 
   def edit
@@ -28,8 +29,8 @@ class UsersController < ApplicationController
   end
 
   def likes
-    authenticate_user!
     @liked_shops = current_user.liked_shops.includes(:persons)
+    @external_likes = current_user.external_likes
   end
 
   private

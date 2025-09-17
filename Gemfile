@@ -81,6 +81,8 @@ group :development, :test do
   gem 'sqlite3'
 end
 
+gem "jquery-rails"
+
 gem "faraday"
 gem "redcarpet"
 gem "httparty"
