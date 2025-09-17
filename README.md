@@ -40,7 +40,7 @@ Esthe Searchは、Google Places APIとHotpepper APIを活用してエステサ�
 ### インフラ・デプロイ
 - **Docker**: コンテナ化対応
 - **Heroku**: 本番環境デプロイ
-- **独自ドメイン**: お名前ドットコム (www.search.com)
+- **独自ドメイン**: お名前ドットコム (www.esthe-search.com)
 - **環境変数管理**: dotenv-rails
 
 ### 開発・テスト
