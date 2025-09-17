@@ -6,6 +6,8 @@
 
 Esthe Searchは、Google Places APIとHotpepper APIを活用してエステサロンを検索し、AI（DeepSeek）によるレビュー分析機能を提供するWebアプリケーションです。
 
+**本番環境**: [www.search.com](https://www.search.com) (Heroku + お名前ドットコム独自ドメイン)
+
 ## 主な機能
 
 - **エステサロン検索**: Google Places APIとHotpepper APIを使用したサロン検索
@@ -38,6 +40,7 @@ Esthe Searchは、Google Places APIとHotpepper APIを活用してエステサ�
 ### インフラ・デプロイ
 - **Docker**: コンテナ化対応
 - **Heroku**: 本番環境デプロイ
+- **独自ドメイン**: お名前ドットコム (www.search.com)
 - **環境変数管理**: dotenv-rails
 
 ### 開発・テスト
@@ -110,7 +113,12 @@ rails server
 
 ## デプロイ
 
-### Heroku
+### 本番環境
+- **URL**: [www.search.com](https://www.search.com)
+- **ホスティング**: Heroku
+- **ドメイン**: お名前ドットコムで取得した独自ドメイン
+
+### Herokuデプロイ手順
 ```bash
 # Heroku CLIでデプロイ
 git push heroku main
@@ -119,6 +127,9 @@ git push heroku main
 heroku config:set GOOGLE_PLACES_API_KEY=your_key
 heroku config:set HOTPEPPER_API_KEY=your_key
 heroku config:set DEEPSEEK_API_KEY=your_key
+
+# 独自ドメインの設定（お名前ドットコム）
+heroku domains:add www.search.com
 ```
 
 ### Docker
