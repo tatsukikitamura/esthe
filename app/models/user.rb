@@ -9,6 +9,7 @@ class User < ApplicationRecord
   has_many :likes, dependent: :destroy
   has_many :liked_shops, through: :likes, source: :shop
   has_many :external_likes, dependent: :destroy
+  has_many :external_comments, dependent: :destroy
 
   validates :name, presence: true
 end

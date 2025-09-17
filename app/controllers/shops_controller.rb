@@ -81,7 +81,8 @@ class ShopsController < ApplicationController
       end
       
       @shop_comment = ShopComment.new if user_signed_in?
-      @shop_comments = [] # APIデータにはコメント機能は使用しない
+      # APIデータ用のexternal_commentsを取得
+      @external_comments = ExternalComment.where(place_id: @place_id).includes(:user).order(created_at: :desc) if @place_id.present?
     else
       # データベースデータの場合
       @is_api_data = false

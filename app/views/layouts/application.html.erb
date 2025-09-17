@@ -202,6 +202,7 @@
         border-radius: 6px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         transition: transform 0.2s ease;
+        cursor: pointer;
       }
       
       .photo-item:hover {
@@ -213,6 +214,130 @@
         height: 120px;
         object-fit: cover;
         display: block;
+      }
+      
+      .photo-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      
+      .photo-item:hover .photo-overlay {
+        opacity: 1;
+      }
+      
+      .photo-zoom-icon {
+        color: white;
+        font-size: 24px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      }
+      
+      /* フォトモーダルのスタイル */
+      .photo-modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.9);
+        animation: fadeIn 0.3s ease;
+      }
+      
+      .photo-modal-content {
+        position: relative;
+        margin: auto;
+        padding: 20px;
+        width: 90%;
+        height: 90%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .photo-modal-close {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #fff;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 2001;
+        transition: color 0.3s ease;
+      }
+      
+      .photo-modal-close:hover {
+        color: #ccc;
+      }
+      
+      #modalPhoto {
+        max-width: 100%;
+        max-height: 80%;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      }
+      
+      .photo-modal-nav {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: rgba(0,0,0,0.7);
+        padding: 10px 20px;
+        border-radius: 25px;
+      }
+      
+      .photo-nav-btn {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: white;
+        font-size: 20px;
+        padding: 8px 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      
+      .photo-nav-btn:hover {
+        background: rgba(255,255,255,0.4);
+      }
+      
+      .photo-nav-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+      
+      .photo-counter {
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        min-width: 60px;
+        text-align: center;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
       }
       
       /* 検索/一覧 共通レイアウトの統一 */
@@ -392,20 +517,181 @@
         }
       }
       
-      /* スマホ版でナビゲーションバーを非表示 */
+      /* ハンバーガーメニューのスタイル */
+      .hamburger-menu {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1001;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        cursor: pointer;
+        display: block;
+      }
+      
+      .hamburger-icon {
+        width: 24px;
+        height: 18px;
+        position: relative;
+        transform: rotate(0deg);
+        transition: .5s ease-in-out;
+        cursor: pointer;
+      }
+      
+      .hamburger-icon span {
+        display: block;
+        position: absolute;
+        height: 3px;
+        width: 100%;
+        background: #333;
+        border-radius: 3px;
+        opacity: 1;
+        left: 0;
+        transform: rotate(0deg);
+        transition: .25s ease-in-out;
+      }
+      
+      .hamburger-icon span:nth-child(1) {
+        top: 0px;
+      }
+      
+      .hamburger-icon span:nth-child(2) {
+        top: 7px;
+      }
+      
+      .hamburger-icon span:nth-child(3) {
+        top: 14px;
+      }
+      
+      .hamburger-icon.open span:nth-child(1) {
+        top: 7px;
+        transform: rotate(135deg);
+      }
+      
+      .hamburger-icon.open span:nth-child(2) {
+        opacity: 0;
+        left: -60px;
+      }
+      
+      .hamburger-icon.open span:nth-child(3) {
+        top: 7px;
+        transform: rotate(-135deg);
+      }
+      
+      /* モバイルメニュー */
+      .mobile-menu {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 250px;
+        height: 100vh;
+        background: #fff;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        padding: 80px 20px 20px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+        display: block;
+      }
+      
+      .mobile-menu.open {
+        transform: translateX(0);
+      }
+      
+      .mobile-menu-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+      }
+      
+      .mobile-menu-overlay.open {
+        display: block;
+      }
+      
+      .mobile-menu-item {
+        display: block;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+        text-decoration: none;
+        color: #333;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      
+      .mobile-menu-item:hover {
+        color: #3498db;
+        background: #f8f9fa;
+        margin: 0 -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+      
+      .mobile-menu-item:last-child {
+        border-bottom: none;
+      }
+      
+      /* スマホ版でナビゲーションバーを非表示、ハンバーガーメニューを表示 */
       @media (max-width: 768px) {
         .navbar {
           display: none;
+        }
+        
+        .hamburger-menu {
+          display: block;
         }
         
         .main-content {
           padding-top: 1rem;
         }
       }
+      
+      /* デスクトップ版ではハンバーガーメニューを非表示 */
+      @media (min-width: 769px) {
+        .hamburger-menu {
+          display: block; /* 一時的にデスクトップでも表示 */
+        }
+      }
     </style>
   </head>
 
   <body>
+    <!-- ハンバーガーメニューボタン -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <div class="hamburger-icon" id="hamburgerIcon">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <!-- モバイルメニューオーバーレイ -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- モバイルメニュー -->
+    <div class="mobile-menu" id="mobileMenu">
+      <% if user_signed_in? %>
+        <%= link_to "🏠 ホーム", root_path, class: "mobile-menu-item" %>
+        <%= link_to "🔍 検索", shops_path, class: "mobile-menu-item" %>
+        <%= link_to "👤 マイページ", users_path, class: "mobile-menu-item" %>
+        <%= link_to "❤️ お気に入り", likes_users_path, class: "mobile-menu-item" %>
+        <%= link_to "🚪 ログアウト", destroy_user_session_path, method: :delete, class: "mobile-menu-item" %>
+      <% else %>
+        <%= link_to "🏠 ホーム", root_path, class: "mobile-menu-item" %>
+        <%= link_to "🔍 検索", shops_path, class: "mobile-menu-item" %>
+        <%= link_to "🔑 ログイン", new_user_session_path, class: "mobile-menu-item" %>
+        <%= link_to "📝 新規登録", new_user_registration_path, class: "mobile-menu-item" %>
+      <% end %>
+    </div>
+
+    <!-- デスクトップ用ナビゲーション -->
     <nav class="navbar">
       <div class="navbar-container">
         <%= link_to "ショップ", root_path, class: "navbar-brand" %>
@@ -438,5 +724,89 @@
     <main class="main-content">
       <%= yield %>
     </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing hamburger menu');
+        
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const hamburgerIcon = document.getElementById('hamburgerIcon');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        
+        console.log('Elements found:', {
+          hamburgerMenu: !!hamburgerMenu,
+          hamburgerIcon: !!hamburgerIcon,
+          mobileMenu: !!mobileMenu,
+          mobileMenuOverlay: !!mobileMenuOverlay
+        });
+        
+        let isMenuOpen = false;
+        
+        function toggleMenu() {
+          console.log('Toggle menu called, current state:', isMenuOpen);
+          isMenuOpen = !isMenuOpen;
+          
+          if (isMenuOpen) {
+            console.log('Opening menu');
+            hamburgerIcon.classList.add('open');
+            mobileMenu.classList.add('open');
+            mobileMenuOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden'; // スクロールを無効化
+          } else {
+            console.log('Closing menu');
+            hamburgerIcon.classList.remove('open');
+            mobileMenu.classList.remove('open');
+            mobileMenuOverlay.classList.remove('open');
+            document.body.style.overflow = ''; // スクロールを有効化
+          }
+        }
+        
+        function closeMenu() {
+          if (isMenuOpen) {
+            isMenuOpen = false;
+            hamburgerIcon.classList.remove('open');
+            mobileMenu.classList.remove('open');
+            mobileMenuOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+        }
+        
+        // ハンバーガーメニューボタンをクリック
+        if (hamburgerMenu) {
+          hamburgerMenu.addEventListener('click', function(e) {
+            console.log('Hamburger menu clicked');
+            e.preventDefault();
+            toggleMenu();
+          });
+          console.log('Event listener added to hamburger menu');
+        } else {
+          console.error('Hamburger menu element not found');
+        }
+        
+        // オーバーレイをクリックしてメニューを閉じる
+        mobileMenuOverlay.addEventListener('click', closeMenu);
+        
+        // メニューアイテムをクリックしてメニューを閉じる
+        const menuItems = document.querySelectorAll('.mobile-menu-item');
+        menuItems.forEach(item => {
+          item.addEventListener('click', closeMenu);
+        });
+        
+        // ESCキーでメニューを閉じる
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && isMenuOpen) {
+            closeMenu();
+          }
+        });
+        
+        // ウィンドウサイズが変更されたときにメニューを閉じる
+        window.addEventListener('resize', function() {
+          if (window.innerWidth > 768 && isMenuOpen) {
+            closeMenu();
+          }
+        });
+      });
+    </script>
   </body>
 </html>

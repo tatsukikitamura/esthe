@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'external_comments/create'
+  get 'external_comments/destroy'
   resources :shops, only: [:index, :show] do
     resources :shop_comments, only: [:create, :destroy]
     resource :like, only: [:create, :destroy]
@@ -12,6 +14,9 @@ Rails.application.routes.draw do
       delete :destroy
     end
   end
+  
+  # External comments for API-based shops
+  resources :external_comments, only: [:create, :destroy]
   get 'shops/search', to: 'shops#search', as: :shops_search
   root to: 'shops#search'
   get 'homes/top'

@@ -64,23 +64,34 @@
           </div>
         <% end %>
         
-        <div class="info-item">
-          <strong>データソース:</strong>
-          <span class="data-source">Google Places API</span>
-        </div>
-      </div>
-
+        
       <% if @photos && @photos.any? %>
         <div class="shop-photos">
           <h2>フォトギャラリー</h2>
           <div class="photos-grid">
-            <% @photos.first(12).each do |photo| %>
+            <% @photos.first(12).each_with_index do |photo, index| %>
               <% ref = photo['photo_reference'] %>
               <% max_width = [photo['width'].to_i, 600].min %>
-              <div class="photo-item">
+              <div class="photo-item" onclick="openPhotoModal(<%= index %>)">
                 <img src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=<%= max_width %>&photoreference=<%= ref %>&key=<%= ENV['GOOGLE_PLACES_API_KEY'] %>" alt="<%= @shop_name %> の写真" />
+                <div class="photo-overlay">
+                  <span class="photo-zoom-icon">🔍</span>
+                </div>
               </div>
             <% end %>
+          </div>
+        </div>
+        
+        <!-- フォトモーダル -->
+        <div id="photoModal" class="photo-modal">
+          <div class="photo-modal-content">
+            <span class="photo-modal-close" onclick="closePhotoModal()">&times;</span>
+            <img id="modalPhoto" src="" alt="拡大写真" />
+            <div class="photo-modal-nav">
+              <button class="photo-nav-btn" id="prevBtn" onclick="changePhoto(-1)">❮</button>
+              <span id="photoCounter" class="photo-counter"></span>
+              <button class="photo-nav-btn" id="nextBtn" onclick="changePhoto(1)">❯</button>
+            </div>
           </div>
         </div>
       <% end %>
@@ -159,11 +170,39 @@
       </div>
     <% end %>
 
-    <% unless @is_api_data %>
-      <!-- コメント投稿フォーム -->
-      <% if user_signed_in? %>
-        <div class="comment-form-section">
-          <h2>レビューを投稿</h2>
+    <!-- コメント投稿フォーム -->
+    <% if user_signed_in? %>
+      <div class="comment-form-section">
+        <h2>レビューを投稿</h2>
+        <% if @is_api_data %>
+          <!-- APIデータ用のコメントフォーム -->
+          <%= form_with url: external_comments_path, method: :post, local: true, class: "comment-form" do |f| %>
+            <div class="form-group">
+              <%= f.label :rating, "評価", class: "form-label" %>
+              <%= f.select :rating, options_for_select((1..5).map{ |i| ["★" * i + " (#{i})", i] }), 
+                  { prompt: "評価を選択してください" }, 
+                  { class: "form-control rating-select", name: "comment[rating]" } %>
+            </div>
+            
+            <div class="form-group">
+              <%= f.label :content, "コメント", class: "form-label" %>
+              <%= f.text_area :content, rows: 4, class: "form-control", 
+                  placeholder: "ショップについてのコメントをお書きください（最大500文字）",
+                  maxlength: 500, name: "comment[content]" %>
+              <small class="character-count">0/500文字</small>
+            </div>
+            
+            <!-- 隠しフィールドでAPIデータの情報を保持 -->
+            <%= f.hidden_field :place_id, value: @place_id, name: "comment[place_id]" %>
+            <%= f.hidden_field :shop_name, value: @shop_name, name: "comment[shop_name]" %>
+            <%= f.hidden_field :shop_address, value: @shop_address, name: "comment[shop_address]" %>
+            
+            <div class="form-actions">
+              <%= f.submit "投稿する", class: "btn btn-primary submit-review" %>
+            </div>
+          <% end %>
+        <% else %>
+          <!-- データベースデータ用のコメントフォーム -->
           <%= form_with model: [@shop, @shop_comment], local: true do |f| %>
             <% if @shop_comment&.errors&.any? %>
               <div class="error-messages">
@@ -195,13 +234,13 @@
               <%= f.submit "投稿する", class: "btn btn-primary submit-review" %>
             </div>
           <% end %>
-        </div>
-      <% else %>
-        <div class="login-prompt">
-          <p>レビューを投稿するにはログインが必要です。</p>
-          <%= link_to "ログイン", new_user_session_path, class: "btn btn-outline-primary" %>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="login-prompt">
+        <p>レビューを投稿するにはログインが必要です。</p>
+        <%= link_to "ログイン", new_user_session_path, class: "btn btn-outline-primary" %>
+      </div>
     <% end %>
 
     <!-- AI分析による評価まとめ -->
@@ -318,6 +357,39 @@
       <h2>レビュー一覧</h2>
       
       <% if @is_api_data %>
+        <!-- ユーザーコメント -->
+        <% if @external_comments && @external_comments.any? %>
+          <div class="user-comments">
+            <h3>ユーザーレビュー</h3>
+            <div class="comments-list">
+              <% @external_comments.each do |comment| %>
+                <div class="comment-item">
+                  <div class="comment-header">
+                    <div class="comment-user-info">
+                      <span class="comment-user"><%= comment.user.name || "匿名ユーザー" %></span>
+                      <span class="comment-rating">
+                        <% comment.rating.times do %>★<% end %>
+                        <span class="rating-number">(<%= comment.rating %>)</span>
+                      </span>
+                    </div>
+                    <div class="comment-meta">
+                      <span class="comment-date"><%= comment.created_at.strftime("%Y年%m月%d日") %></span>
+                      <% if current_user == comment.user %>
+                        <%= link_to "削除", external_comment_path(comment), method: :delete, 
+                            confirm: "本当に削除しますか？", 
+                            class: "comment-delete" %>
+                      <% end %>
+                    </div>
+                  </div>
+                  <div class="comment-content">
+                    <%= simple_format(comment.content) %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        
         <!-- Google Places レビュー -->
         <% if @place_reviews && @place_reviews.any? %>
           <div class="google-reviews">
@@ -366,10 +438,10 @@
               <% end %>
             </div>
           </div>
-        <% else %>
+        <% elsif @external_comments.blank? %>
           <div class="no-reviews">
             <div class="no-reviews-icon">💬</div>
-            <p>Google Places のレビューはありません。</p>
+            <p>レビューはありません。</p>
           </div>
         <% end %>
       <% else %>
@@ -422,6 +494,108 @@
 <% end %>
 
 <script>
+// フォトモーダル関連の変数
+let currentPhotoIndex = 0;
+let photos = [];
+
+// ページ読み込み時に写真データを準備
+document.addEventListener('DOMContentLoaded', function() {
+  <% if @photos && @photos.any? %>
+    photos = [
+      <% @photos.first(12).each do |photo| %>
+        {
+          ref: '<%= photo['photo_reference'] %>',
+          width: <%= photo['width'] || 800 %>,
+          height: <%= photo['height'] || 600 %>
+        },
+      <% end %>
+    ];
+  <% end %>
+});
+
+function openPhotoModal(index) {
+  currentPhotoIndex = index;
+  const modal = document.getElementById('photoModal');
+  const modalPhoto = document.getElementById('modalPhoto');
+  const photoCounter = document.getElementById('photoCounter');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  
+  if (photos.length === 0) return;
+  
+  // 写真を表示
+  updateModalPhoto();
+  
+  // カウンターを更新
+  photoCounter.textContent = `${currentPhotoIndex + 1} / ${photos.length}`;
+  
+  // ナビゲーションボタンの状態を更新
+  prevBtn.disabled = currentPhotoIndex === 0;
+  nextBtn.disabled = currentPhotoIndex === photos.length - 1;
+  
+  // モーダルを表示
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden'; // スクロールを無効化
+}
+
+function closePhotoModal() {
+  const modal = document.getElementById('photoModal');
+  modal.style.display = 'none';
+  document.body.style.overflow = ''; // スクロールを有効化
+}
+
+function changePhoto(direction) {
+  const newIndex = currentPhotoIndex + direction;
+  
+  if (newIndex >= 0 && newIndex < photos.length) {
+    currentPhotoIndex = newIndex;
+    updateModalPhoto();
+    
+    // カウンターを更新
+    const photoCounter = document.getElementById('photoCounter');
+    photoCounter.textContent = `${currentPhotoIndex + 1} / ${photos.length}`;
+    
+    // ナビゲーションボタンの状態を更新
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    prevBtn.disabled = currentPhotoIndex === 0;
+    nextBtn.disabled = currentPhotoIndex === photos.length - 1;
+  }
+}
+
+function updateModalPhoto() {
+  const modalPhoto = document.getElementById('modalPhoto');
+  const photo = photos[currentPhotoIndex];
+  
+  if (photo) {
+    // 高解像度の写真を取得（maxwidth=1200）
+    const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=1200&photoreference=${photo.ref}&key=<%= ENV['GOOGLE_PLACES_API_KEY'] %>`;
+    modalPhoto.src = photoUrl;
+    modalPhoto.alt = '<%= @shop_name %> の写真';
+  }
+}
+
+// キーボードナビゲーション
+document.addEventListener('keydown', function(e) {
+  const modal = document.getElementById('photoModal');
+  if (modal.style.display === 'block') {
+    if (e.key === 'Escape') {
+      closePhotoModal();
+    } else if (e.key === 'ArrowLeft') {
+      changePhoto(-1);
+    } else if (e.key === 'ArrowRight') {
+      changePhoto(1);
+    }
+  }
+});
+
+// モーダル外をクリックして閉じる
+document.getElementById('photoModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closePhotoModal();
+  }
+});
+
 function startAIAnalysis() {
   const button = document.getElementById('analyzeBtn');
   const status = document.getElementById('analyzeStatus');

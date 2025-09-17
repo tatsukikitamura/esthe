@@ -1,0 +1,2 @@
+module ExternalCommentsHelper
+end
