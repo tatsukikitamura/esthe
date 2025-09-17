@@ -9,6 +9,7 @@ class ShopApiService
         req.params['location'] = location # 緯度と経度
         req.params['radius'] = radius # 検索範囲（メートル）
         req.params['key'] = api_key
+        req.params['language'] = 'ja'
       end
   
       return JSON.parse(response.body) if response.status == 200
@@ -33,7 +34,7 @@ class ShopApiService
 
         # 1ページ目を取得（通常の検索クエリ）
         first_response = Faraday.get(API_URL) do |req|
-          req.params['query'] = "#{query} ショップ"
+          req.params['query'] = query
           req.params['location'] = location
           req.params['radius'] = radius
           req.params['key'] = api_key

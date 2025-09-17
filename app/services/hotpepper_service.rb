@@ -38,7 +38,7 @@ class HotpepperService
         key: api_key,
         keyword: shop_name,
         format: 'json',
-        count: 20
+        count: 4
       }
     )
     
@@ -52,7 +52,7 @@ class HotpepperService
         key: api_key,
         keyword: keyword,
         format: 'json',
-        count: 20
+        count: 4
       }
     )
     
